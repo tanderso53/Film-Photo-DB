@@ -20,6 +20,12 @@ in another table.
 
 ** entity_type
 
+Entities are special metadata lists that may have custom properties
+that are listed in a separate entity_type_properties object that
+relates back to a certain entity_type row. Another object,
+entity_property_values then relates to the entity and the property to
+provide the value of the property for the entity instance.
+
 *** entity_type_id
 :PROPERTIES:
 :type:     unsigned long
@@ -266,6 +272,23 @@ doesn't need to be in the process table
 
 listed exposure index
 
+** data_type
+
+*** data_type_id
+:PROPERTIES:
+:TYPE:     unsigned long
+:UNIQUE:   true
+:END:
+
+*** name
+:PROPERTIES:
+:TYPE:     text
+:END:
+
+*** description
+:PROPERTIES:
+:TYPE:     text
+:END:
 * objects_schema
 
 This schema presents heirarchical data objects with 1:many
@@ -438,6 +461,65 @@ exposure index
 :TYPE:     text[64]
 :END:
 
+** entity_type_properties
+
+*** entity_type_properties_id
+:PROPERTIES:
+:TYPE:     unsigned long
+:UNIQUE:   true
+:END:
+
+*** name
+:PROPERTIES:
+:TYPE:     text
+:END:
+
+*** description
+:PROPERTIES:
+:TYPE:     text
+:END:
+
+*** entity_type_id
+:PROPERTIES:
+:TYPE:     unsigned long
+:RELATED:  entity_type
+:END:
+
+*** data_type_id
+:PROPERTIES:
+:TYPE:     unsigned long
+:RELATED:  data_type
+:END:
+
+** entity_property_values
+
+*** entity_property_values_id
+:PROPERTIES:
+:TYPE:     unsigned long
+:UNIQUE:   true
+:END:
+
+*** name
+:PROPERTIES:
+:TYPE:     text
+:END:
+
+*** description
+:PROPERTIES:
+:TYPE:     text
+:END:
+
+*** entity_type_properties_id
+:PROPERTIES:
+:TYPE:     unsigned long
+:RELATED:  entity_type_properties
+:END:
+
+*** entity_id
+:PROPERTIES:
+:TYPE:     unsigned long
+:RELATED:  entity
+:END:
 * Extended Format (JSON)
 
 Extended properties will be concatenated with inherited props
@@ -447,97 +529,113 @@ Extended properties will be concatenated with inherited props
 * Column view
 
 #+BEGIN: columnview :hlines 1 :id global :indent t
-| item                                     | type             | related     | constraint     | unique |
-|------------------------------------------+------------------+-------------+----------------+--------|
-| metadata_schema                          |                  |             |                |        |
-| \_  entity_type                          |                  |             |                |        |
-| \_    entity_type_id                     | unsigned long    |             |                | true   |
-| \_    digital                            | bool             |             |                |        |
-| \_    max_instances                      | unsigned int     |             |                |        |
-| \_    name                               | text             |             |                |        |
-| \_    description                        | text             |             |                |        |
-| \_    extended_props                     | text[64]         |             |                |        |
-| \_    inherited_props                    | text             |             | entity_type_id |        |
-| \_  lab                                  |                  |             |                |        |
-| \_    lab_id                             | unsigned long    |             |                | true   |
-| \_    name                               | text             |             |                |        |
-| \_    description                        | text             |             |                |        |
-| \_    street_address                     | text             |             |                |        |
-| \_    web_address                        | text             |             |                |        |
-| \_    email_address                      | text             |             |                |        |
-| \_    phone_customer_service             | text             |             |                |        |
-| \_  process                              |                  |             |                |        |
-| \_    process_id                         | unsigned long    |             |                | true   |
-| \_    name                               | text             |             |                |        |
-| \_    description                        | text             |             |                |        |
-| \_  assignment                           |                  |             |                |        |
-| \_    assignment_id                      | unsigned long    |             |                | true   |
-| \_    name                               | text             |             |                |        |
-| \_    description                        | text             |             |                |        |
-| \_    location                           | text             |             |                |        |
-| \_    start_date                         | datetime         |             |                |        |
-| \_    end_date                           | datetime         |             |                |        |
-| \_  camera                               |                  |             |                |        |
-| \_    camera_id                          | unsigned long    |             |                | true   |
-| \_    name                               | text             |             |                |        |
-| \_    description                        | text             |             |                |        |
-| \_    manufacturer                       | text             |             |                |        |
-| \_    model                              | text             |             |                |        |
-| \_    lens_removeable                    | bool             |             |                |        |
-| \_  lens                                 |                  |             |                |        |
-| \_    lens_id                            | unsigned long    |             |                | true   |
-| \_    name                               | text             |             |                |        |
-| \_    description                        | text             |             |                |        |
-| \_    manufacturer                       | text             |             |                |        |
-| \_    model                              | text             |             |                |        |
-| \_    built_in                           | bool             |             |                |        |
-| \_    f_number                           | text             |             |                |        |
-| \_    focal_length                       | text             |             |                |        |
-| \_  film                                 |                  |             |                |        |
-| \_    film_id                            | unsigned long    |             |                | true   |
-| \_    name                               | text             |             |                |        |
-| \_    description                        | text             |             |                |        |
-| \_    manufacturer                       | text             |             |                |        |
-| \_    color                              | bool             |             |                |        |
-| \_    negative                           | bool             |             |                |        |
-| \_    listed_process                     | text             |             |                |        |
-| \_    iso                                | unsigned int     |             |                |        |
-| \_    listed_ei                          | unsigned int[10] |             |                |        |
-|------------------------------------------+------------------+-------------+----------------+--------|
-| objects_schema                           |                  |             |                |        |
-| \_  roll                                 |                  |             |                |        |
-| \_    roll_id                            | unsigned long    |             |                | true   |
-| \_    name                               | text             |             |                |        |
-| \_    description                        | text             |             |                |        |
-| \_    lab_id                             | unsigned long    | lab         |                |        |
-| \_    process_id                         | unsigned long    | process     |                |        |
-| \_    developed_date                     | datetime         |             |                |        |
-| \_    old_roll_ident                     | text             |             |                |        |
-| \_    lab_roll_ident                     | text             |             |                |        |
-| \_  frame                                |                  |             |                |        |
-| \_    frame_id                           | unsigned long    |             |                | true   |
-| \_    roll_id                            | unsigned long    | roll        |                |        |
-| \_    frame_num                          | int              |             |                |        |
-| \_    name                               | text             |             |                |        |
-| \_    description                        | text             |             |                |        |
-| \_    date_time_stamp                    | datetime         |             |                |        |
-| \_    assignment_id                      | unsigned long    | assignment  |                |        |
-| \_    camera_id                          | unsigned long    | camera      |                |        |
-| \_    lens_id                            | unsigned long    | lens        |                |        |
-| \_    film_id                            | unsigned long    | film        |                |        |
-| \_    ei                                 | unsigned int     |             |                |        |
-| \_  entity                               |                  |             |                |        |
-| \_    entity_id                          | unsigned long    |             |                | true   |
-| \_    frame_id                           | unsigned int     | frame       |                |        |
-| \_    entity_type_id                     | unsigned long    | entity_type |                |        |
-| \_    name                               | text             |             |                |        |
-| \_    description                        | text             |             |                |        |
-| \_    date_time_stamp                    | datetime         |             |                |        |
-| \_    series                             | text             |             |                |        |
-| \_    extended_props                     | text[64]         |             |                |        |
-|------------------------------------------+------------------+-------------+----------------+--------|
-| Extended Format (JSON)                   |                  |             |                |        |
-| \_  "Property name": "Property value(s)" |                  |             |                |        |
-|------------------------------------------+------------------+-------------+----------------+--------|
-| Column view                              |                  |             |                |        |
+| item                                     | type             | related                | constraint     | unique |
+|------------------------------------------+------------------+------------------------+----------------+--------|
+| metadata_schema                          |                  |                        |                |        |
+| \_  entity_type                          |                  |                        |                |        |
+| \_    entity_type_id                     | unsigned long    |                        |                | true   |
+| \_    digital                            | bool             |                        |                |        |
+| \_    max_instances                      | unsigned int     |                        |                |        |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    extended_props                     | text[64]         |                        |                |        |
+| \_    inherited_props                    | text             |                        | entity_type_id |        |
+| \_  lab                                  |                  |                        |                |        |
+| \_    lab_id                             | unsigned long    |                        |                | true   |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    street_address                     | text             |                        |                |        |
+| \_    web_address                        | text             |                        |                |        |
+| \_    email_address                      | text             |                        |                |        |
+| \_    phone_customer_service             | text             |                        |                |        |
+| \_  process                              |                  |                        |                |        |
+| \_    process_id                         | unsigned long    |                        |                | true   |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_  assignment                           |                  |                        |                |        |
+| \_    assignment_id                      | unsigned long    |                        |                | true   |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    location                           | text             |                        |                |        |
+| \_    start_date                         | datetime         |                        |                |        |
+| \_    end_date                           | datetime         |                        |                |        |
+| \_  camera                               |                  |                        |                |        |
+| \_    camera_id                          | unsigned long    |                        |                | true   |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    manufacturer                       | text             |                        |                |        |
+| \_    model                              | text             |                        |                |        |
+| \_    lens_removeable                    | bool             |                        |                |        |
+| \_  lens                                 |                  |                        |                |        |
+| \_    lens_id                            | unsigned long    |                        |                | true   |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    manufacturer                       | text             |                        |                |        |
+| \_    model                              | text             |                        |                |        |
+| \_    built_in                           | bool             |                        |                |        |
+| \_    f_number                           | text             |                        |                |        |
+| \_    focal_length                       | text             |                        |                |        |
+| \_  film                                 |                  |                        |                |        |
+| \_    film_id                            | unsigned long    |                        |                | true   |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    manufacturer                       | text             |                        |                |        |
+| \_    color                              | bool             |                        |                |        |
+| \_    negative                           | bool             |                        |                |        |
+| \_    listed_process                     | text             |                        |                |        |
+| \_    iso                                | unsigned int     |                        |                |        |
+| \_    listed_ei                          | unsigned int[10] |                        |                |        |
+| \_  data_type                            |                  |                        |                |        |
+| \_    data_type_id                       | unsigned long    |                        |                | true   |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+|------------------------------------------+------------------+------------------------+----------------+--------|
+| objects_schema                           |                  |                        |                |        |
+| \_  roll                                 |                  |                        |                |        |
+| \_    roll_id                            | unsigned long    |                        |                | true   |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    lab_id                             | unsigned long    | lab                    |                |        |
+| \_    process_id                         | unsigned long    | process                |                |        |
+| \_    developed_date                     | datetime         |                        |                |        |
+| \_    old_roll_ident                     | text             |                        |                |        |
+| \_    lab_roll_ident                     | text             |                        |                |        |
+| \_  frame                                |                  |                        |                |        |
+| \_    frame_id                           | unsigned long    |                        |                | true   |
+| \_    roll_id                            | unsigned long    | roll                   |                |        |
+| \_    frame_num                          | int              |                        |                |        |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    date_time_stamp                    | datetime         |                        |                |        |
+| \_    assignment_id                      | unsigned long    | assignment             |                |        |
+| \_    camera_id                          | unsigned long    | camera                 |                |        |
+| \_    lens_id                            | unsigned long    | lens                   |                |        |
+| \_    film_id                            | unsigned long    | film                   |                |        |
+| \_    ei                                 | unsigned int     |                        |                |        |
+| \_  entity                               |                  |                        |                |        |
+| \_    entity_id                          | unsigned long    |                        |                | true   |
+| \_    frame_id                           | unsigned int     | frame                  |                |        |
+| \_    entity_type_id                     | unsigned long    | entity_type            |                |        |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    date_time_stamp                    | datetime         |                        |                |        |
+| \_    series                             | text             |                        |                |        |
+| \_    extended_props                     | text[64]         |                        |                |        |
+| \_  entity_type_properties               |                  |                        |                |        |
+| \_    entity_type_properties_id          | unsigned long    |                        |                | true   |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    entity_type_id                     | unsigned long    | entity_type            |                |        |
+| \_    data_type_id                       | unsigned long    | data_type              |                |        |
+| \_  entity_property_values               |                  |                        |                |        |
+| \_    entity_property_values_id          | unsigned long    |                        |                | true   |
+| \_    name                               | text             |                        |                |        |
+| \_    description                        | text             |                        |                |        |
+| \_    entity_type_properties_id          | unsigned long    | entity_type_properties |                |        |
+| \_    entity_id                          | unsigned long    | entity                 |                |        |
+|------------------------------------------+------------------+------------------------+----------------+--------|
+| Extended Format (JSON)                   |                  |                        |                |        |
+| \_  "Property name": "Property value(s)" |                  |                        |                |        |
+|------------------------------------------+------------------+------------------------+----------------+--------|
+| Column view                              |                  |                        |                |        |
 #+END:

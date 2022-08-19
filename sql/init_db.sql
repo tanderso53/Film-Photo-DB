@@ -75,6 +75,12 @@ create table if not exists metadata_schema.film (
   listed_ei integer[]
 );
 
+create table if not exists metadata_schema.data_type (
+  data_type_id begserial primary key,
+  name text,
+  description text
+);
+
 create table if not exists objects_schema.roll (
   roll_id bigserial primary key,
   name text,
@@ -109,4 +115,20 @@ create table if not exists objects_schema.entity (
   date_time_stamp timestamptz,
   series text,
   extended_props text[]
+);
+
+create table if not exists objects_schema.entity_type_properties (
+  entity_type_properties_id bigserial primary key,
+  name text,
+  description text,
+  entity_type_id bigint references metadata_schema.entity_type,
+  data_type_id bigint references metadata_schema.data_type
+);
+
+create table if not exists objects_schema.entity_property_values (
+  entity_property_values_id bigserial primary key,
+  name text,
+  description text,
+  entity_type_properties_id bigint references objects_schema.entity_type_properties,
+  entity_id bigint references objects_schema.entity
 );
