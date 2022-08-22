@@ -111,12 +111,12 @@ namespace data_model {
 
       struct entity_type_properties : public dm_table {
 	metadata_schema::entity_type *entity_type = NULL;
-	metadata_schema::data_type *data_type = NULL;
+	metadata_schema::data_type data_type;
       } properties[DM_PROPERTYLIMIT];
 
       struct entity_property_values : public dm_table {
 	entity_type_properties *entity_type_properties = NULL;
-	object_schema::entity *entity;
+	object_schema::entity *entity = NULL;
       } values[DM_PROPERTYLIMIT];
     };
   }
